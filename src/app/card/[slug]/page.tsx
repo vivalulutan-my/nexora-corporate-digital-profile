@@ -158,7 +158,11 @@ export default async function CardPage({
               color={theme.button.split(" ")[0]}
               icon="vcard"
             />
-            <LeadCaptureForm employeeId={employee.id} companyId={employee.company_id} />
+            <LeadCaptureForm
+              employeeId={employee.id}
+              companyId={employee.company_id}
+              buttonClass={theme.button}
+            />
             <InquiryForm
               employeeId={employee.id}
               companyId={employee.company_id}

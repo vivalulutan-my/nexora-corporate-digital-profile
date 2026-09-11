@@ -17,9 +17,11 @@ function extractPhone(text: string) {
 export default function LeadCaptureForm({
   employeeId,
   companyId,
+  buttonClass = "bg-blue-900 hover:bg-blue-800",
 }: {
   employeeId: number;
   companyId: number;
+  buttonClass?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
@@ -164,21 +166,21 @@ export default function LeadCaptureForm({
               type="button"
               onClick={handleScan}
               disabled={!imagePreview || scanning}
-              className="flex-1 rounded-lg bg-blue-600 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              className="flex-1 rounded-lg bg-zinc-200 py-2 text-sm font-semibold text-zinc-700 disabled:opacity-60 dark:bg-zinc-800 dark:text-zinc-200"
             >
               {scanning ? "Scanning..." : "Scan"}
             </button>
             <button
               type="submit"
               disabled={pending || !name || !phone}
-              className="flex-1 rounded-lg bg-green-600 py-2 text-sm font-semibold text-white disabled:opacity-60"
+              className={`flex-1 rounded-lg py-2 text-sm font-semibold text-white disabled:opacity-60 ${buttonClass}`}
             >
               {pending ? "Saving..." : "Save"}
             </button>
             <button
               type="button"
               onClick={() => setOpen(false)}
-              className="flex-1 rounded-lg bg-zinc-500 py-2 text-sm font-semibold text-white"
+              className="flex-1 rounded-lg bg-zinc-200 py-2 text-sm font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
             >
               Cancel
             </button>
