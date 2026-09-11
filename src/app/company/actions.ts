@@ -179,6 +179,73 @@ export async function toggleEmployeeStatus(employeeId: number, newStatus: string
   redirect("/company/employees");
 }
 
+export async function updateCompanyProfile(formData: FormData) {
+  const session = await requireCompanySession();
+  const companyId = session.companyId!;
+
+  const companyBio = String(formData.get("companyBio") ?? "").trim();
+  const address = String(formData.get("address") ?? "").trim();
+  const city = String(formData.get("city") ?? "").trim();
+  const state = String(formData.get("state") ?? "").trim();
+  const postcode = String(formData.get("postcode") ?? "").trim();
+  const country = String(formData.get("country") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
+  const logoFile = formData.get("logo") as File | null;
+  const backgroundFile = formData.get("background") as File | null;
+  const socials = readSocialInputs(formData);
+
+  const logoPath =
+    logoFile && logoFile.size > 0 ? await saveUpload(logoFile, "companies") : null;
+  const backgroundPath =
+    backgroundFile && backgroundFile.size > 0
+      ? await saveUpload(backgroundFile, "companies")
+      : null;
+
+  const db = await getDb();
+  const request = db
+    .request()
+    .input("id", sql.Int, companyId)
+    .input("companyBio", sql.NVarChar, companyBio || null)
+    .input("address", sql.NVarChar, address || null)
+    .input("city", sql.NVarChar, city || null)
+    .input("state", sql.NVarChar, state || null)
+    .input("postcode", sql.NVarChar, postcode || null)
+    .input("country", sql.NVarChar, country || null)
+    .input("phone", sql.NVarChar, phone || null)
+    .input("email", sql.NVarChar, email || null);
+
+  socials.forEach((s) => request.input(s.column, sql.NVarChar, s.value));
+
+  const extraSets: string[] = [];
+  if (logoPath) {
+    request.input("logo", sql.NVarChar, logoPath);
+    extraSets.push("logo = @logo");
+  }
+  if (backgroundPath) {
+    request.input("cardBackground", sql.NVarChar, backgroundPath);
+    extraSets.push("card_background = @cardBackground");
+  }
+
+  await request.query(`
+      UPDATE companies SET
+        company_bio = @companyBio,
+        address = @address,
+        city = @city,
+        state = @state,
+        postcode = @postcode,
+        country = @country,
+        phone = @phone,
+        email = @email,
+        updated_at = SYSDATETIME(),
+        ${socials.map((s) => `${s.column} = @${s.column}`).join(", ")}
+        ${extraSets.length ? ", " + extraSets.join(", ") : ""}
+      WHERE id = @id
+    `);
+
+  redirect("/company/profile");
+}
+
 export async function createBranch(formData: FormData) {
   const session = await requireCompanySession();
   const companyId = session.companyId!;

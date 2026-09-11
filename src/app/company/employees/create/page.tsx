@@ -1,7 +1,7 @@
 import { getSession } from "@/lib/session";
 import { getDb, sql } from "@/lib/db";
 import { createEmployee } from "@/app/company/actions";
-import SocialFields from "@/app/company/employees/SocialFields";
+import SocialFields from "@/components/SocialFields";
 
 export default async function CreateEmployeePage() {
   const session = await getSession();

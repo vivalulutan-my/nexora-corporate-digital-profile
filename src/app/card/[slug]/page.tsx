@@ -9,7 +9,15 @@ async function getEmployee(slug: string) {
     .request()
     .input("slug", sql.NVarChar, slug)
     .query(`
-      SELECT e.*, c.company_name AS tenant_name, c.company_bio, c.logo AS company_logo_url
+      SELECT e.*, c.company_name AS tenant_name, c.company_bio, c.logo AS company_logo_url,
+        c.card_background AS company_card_background,
+        c.social_facebook AS company_social_facebook,
+        c.social_instagram AS company_social_instagram,
+        c.social_twitter AS company_social_twitter,
+        c.social_tiktok AS company_social_tiktok,
+        c.social_youtube AS company_social_youtube,
+        c.social_linkedin AS company_social_linkedin,
+        c.social_xiaohongshu AS company_social_xiaohongshu
       FROM employees e
       JOIN companies c ON c.id = e.company_id
       WHERE e.card_slug = @slug AND e.status = 'active'
@@ -43,19 +51,21 @@ export default async function CardPage({
     { key: "social_linkedin", label: "LinkedIn" },
     { key: "social_youtube", label: "YouTube" },
     { key: "social_xiaohongshu", label: "Xiaohongshu" },
-  ].filter((s) => employee[s.key]);
+  ]
+    .map((s) => ({
+      ...s,
+      url: employee[s.key] || employee[`company_${s.key}`],
+    }))
+    .filter((s) => s.url);
+
+  const cardBackground = employee.card_background || employee.company_card_background;
 
   return (
     <div className="flex min-h-screen items-start justify-center bg-zinc-100 px-4 py-8 dark:bg-zinc-900">
       <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-zinc-950">
         <div className="relative h-32 bg-gradient-to-br from-[#1e3a8a] to-[#0b1638]">
-          {employee.card_background && (
-            <Image
-              src={employee.card_background}
-              alt=""
-              fill
-              className="object-cover"
-            />
+          {cardBackground && (
+            <Image src={cardBackground} alt="" fill className="object-cover" />
           )}
         </div>
 
@@ -113,7 +123,7 @@ export default async function CardPage({
               {socials.map((s) => (
                 <a
                   key={s.key}
-                  href={employee[s.key]}
+                  href={s.url}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200"
@@ -130,9 +140,19 @@ export default async function CardPage({
             </p>
           )}
 
-          <p className="mt-6 text-xs font-semibold text-zinc-400">
-            {employee.tenant_name}
-          </p>
+          {employee.company_logo_url ? (
+            <Image
+              src={employee.company_logo_url}
+              alt={employee.tenant_name}
+              width={120}
+              height={32}
+              className="mt-6 h-8 w-auto object-contain"
+            />
+          ) : (
+            <p className="mt-6 text-xs font-semibold text-zinc-400">
+              {employee.tenant_name}
+            </p>
+          )}
         </div>
       </div>
     </div>
