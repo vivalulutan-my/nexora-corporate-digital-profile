@@ -123,21 +123,33 @@ export default async function CardPage({
 
           <div className="mt-6 grid grid-cols-4 gap-4">
             {employee.phone && (
-              <ActionIcon href={`tel:${employee.phone}`} color="bg-blue-600" label="Call" icon="call" />
+              <ActionIcon
+                href={`/card/${slug}/track/call?url=${encodeURIComponent(`tel:${employee.phone}`)}`}
+                color="bg-blue-600"
+                label="Call"
+                icon="call"
+              />
             )}
             {employee.phone && (
               <ActionIcon
-                href={`https://wa.me/${employee.phone.replace(/\D/g, "")}`}
+                href={`/card/${slug}/track/whatsapp?url=${encodeURIComponent(
+                  `https://wa.me/${employee.phone.replace(/\D/g, "")}`
+                )}`}
                 color="bg-green-500"
                 label="WhatsApp"
                 icon="whatsapp"
               />
             )}
             {employee.email && (
-              <ActionIcon href={`mailto:${employee.email}`} color="bg-amber-500" label="Email" icon="email" />
+              <ActionIcon
+                href={`/card/${slug}/track/email?url=${encodeURIComponent(`mailto:${employee.email}`)}`}
+                color="bg-amber-500"
+                label="Email"
+                icon="email"
+              />
             )}
             <ActionIcon
-              href={`/card/${slug}/vcard`}
+              href={`/card/${slug}/track/vcard?url=${encodeURIComponent(`/card/${slug}/vcard`)}`}
               color={theme.button.split(" ")[0]}
               label="Save Contact"
               icon="vcard"

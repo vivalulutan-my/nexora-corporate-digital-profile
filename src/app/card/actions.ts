@@ -24,5 +24,13 @@ export async function submitInquiry(
       VALUES (@employeeId, @companyId, @name, @phone, @email, @message)
     `);
 
+  await db
+    .request()
+    .input("employeeId", sql.Int, employeeId)
+    .input("companyId", sql.Int, companyId)
+    .query(
+      "INSERT INTO analytics (employee_id, company_id, event_type) VALUES (@employeeId, @companyId, 'inquiry')"
+    );
+
   return { success: true };
 }

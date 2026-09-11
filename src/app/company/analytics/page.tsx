@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { getDb, sql } from "@/lib/db";
 import VisitsChart from "@/components/VisitsChart";
+import EventsBarChart from "@/components/EventsBarChart";
 
 const RANGE_PRESETS = [
   { key: "7", label: "Last 7 days" },
@@ -67,10 +68,12 @@ export default async function AnalyticsPage({
   const byType = await db
     .request()
     .input("companyId", sql.Int, session!.companyId)
+    .input("days", sql.Int, days)
     .query(`
       SELECT event_type, COUNT(*) AS total
       FROM analytics
       WHERE company_id = @companyId
+        AND created_at >= DATEADD(day, -@days, CAST(SYSDATETIME() AS DATE))
       GROUP BY event_type
       ORDER BY total DESC
     `);
@@ -128,17 +131,20 @@ export default async function AnalyticsPage({
           <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
             Events by Type
           </h2>
-          <ul className="mt-4 flex flex-col gap-2 text-sm">
-            {byType.recordset.map((row) => (
-              <li key={row.event_type} className="flex justify-between">
-                <span className="capitalize">{row.event_type ?? "unknown"}</span>
-                <span className="font-semibold">{row.total}</span>
-              </li>
-            ))}
-            {byType.recordset.length === 0 && (
-              <li className="text-zinc-400">No analytics events yet.</li>
-            )}
-          </ul>
+          {byType.recordset.length > 0 ? (
+            <div className="mt-2">
+              <EventsBarChart
+                data={byType.recordset.map((row) => ({
+                  label: row.event_type ?? "unknown",
+                  count: row.total,
+                }))}
+              />
+            </div>
+          ) : (
+            <p className="mt-4 text-sm text-zinc-400">
+              No analytics events yet.
+            </p>
+          )}
         </div>
 
         <div className="rounded-xl bg-white p-6 shadow-sm dark:bg-zinc-950">
