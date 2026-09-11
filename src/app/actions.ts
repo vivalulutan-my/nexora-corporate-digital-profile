@@ -30,6 +30,11 @@ export async function login(email: string, password: string) {
     companyId: user.company_id ?? null,
   });
 
+  await db
+    .request()
+    .input("id", sql.Int, user.id)
+    .query("UPDATE users SET last_login = SYSDATETIME() WHERE id = @id");
+
   const redirectTo = user.role === "super_admin" ? "/admin" : "/company";
 
   return { success: true, message: `Welcome, ${user.username}.`, redirectTo };

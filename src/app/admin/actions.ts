@@ -78,7 +78,8 @@ export async function createSubAdmin(formData: FormData) {
       VALUES (@username, @email, @passwordHash, 'sub_admin', 'active', @companyId)
     `);
 
-  redirect("/admin/subadmins");
+  const redirectTo = String(formData.get("redirectTo") ?? "/admin/subadmins");
+  redirect(redirectTo);
 }
 
 export async function toggleSubAdminStatus(userId: number, newStatus: string) {
@@ -90,4 +91,88 @@ export async function toggleSubAdminStatus(userId: number, newStatus: string) {
     .input("status", sql.VarChar, newStatus)
     .query("UPDATE users SET status = @status WHERE id = @userId");
   redirect("/admin/subadmins");
+}
+
+export async function updateSubAdmin(
+  userId: number,
+  companyId: number,
+  username: string,
+  email: string
+) {
+  await requireSuperAdmin();
+  const db = await getDb();
+  await db
+    .request()
+    .input("userId", sql.Int, userId)
+    .input("username", sql.NVarChar, username)
+    .input("email", sql.NVarChar, email)
+    .query("UPDATE users SET username = @username, email = @email WHERE id = @userId");
+  redirect(`/admin/companies/${companyId}/admins`);
+}
+
+export async function resetSubAdminPassword(
+  userId: number,
+  companyId: number,
+  newPassword: string
+) {
+  await requireSuperAdmin();
+  if (!newPassword) return { success: false, message: "Password is required." };
+
+  const passwordHash = await bcrypt.hash(newPassword, 10);
+  const db = await getDb();
+  await db
+    .request()
+    .input("userId", sql.Int, userId)
+    .input("passwordHash", sql.NVarChar, passwordHash)
+    .query("UPDATE users SET password_hash = @passwordHash WHERE id = @userId");
+  redirect(`/admin/companies/${companyId}/admins`);
+}
+
+export async function terminateSubAdmin(userId: number, companyId: number) {
+  await requireSuperAdmin();
+  const db = await getDb();
+  await db
+    .request()
+    .input("userId", sql.Int, userId)
+    .query("UPDATE users SET status = 'disabled' WHERE id = @userId");
+  redirect(`/admin/companies/${companyId}/admins`);
+}
+
+export async function toggleCompanyStatus(companyId: number, newStatus: string) {
+  await requireSuperAdmin();
+  const db = await getDb();
+  await db
+    .request()
+    .input("companyId", sql.Int, companyId)
+    .input("status", sql.VarChar, newStatus)
+    .query(
+      "UPDATE companies SET status = @status, updated_at = SYSDATETIME() WHERE id = @companyId"
+    );
+  redirect("/admin");
+}
+
+export async function updateLicense(formData: FormData) {
+  await requireSuperAdmin();
+
+  const companyId = Number(formData.get("companyId"));
+  const licenseNo = String(formData.get("licenseNo") ?? "").trim();
+  const endDate = String(formData.get("endDate") ?? "") || null;
+
+  if (!companyId || !licenseNo) {
+    return { success: false, message: "License limit is required." };
+  }
+
+  const db = await getDb();
+  await db
+    .request()
+    .input("companyId", sql.Int, companyId)
+    .input("licenseNo", sql.NVarChar, licenseNo)
+    .input("endDate", sql.Date, endDate)
+    .query(`
+      UPDATE companies
+      SET license_no = @licenseNo, end_date = @endDate, updated_at = SYSDATETIME()
+      WHERE id = @companyId
+    `);
+
+  redirect("/admin");
 }

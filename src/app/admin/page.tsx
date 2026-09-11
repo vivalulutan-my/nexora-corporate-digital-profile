@@ -1,5 +1,6 @@
 import { getDb } from "@/lib/db";
 import { formatDate } from "@/lib/format";
+import CompanyActionsMenu from "./CompanyActionsMenu";
 
 type CompanyRow = {
   id: number;
@@ -76,6 +77,7 @@ export default async function AdminDashboard() {
                 <th className="py-2 pr-4 font-medium">License Usage</th>
                 <th className="py-2 pr-4 font-medium">Subscription</th>
                 <th className="py-2 pr-4 font-medium">Status</th>
+                <th className="py-2 pr-4 font-medium">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -122,6 +124,9 @@ export default async function AdminDashboard() {
                       </div>
                     </td>
                     <td className="py-3 pr-4 capitalize">{c.status}</td>
+                    <td className="py-3 pr-4">
+                      <CompanyActionsMenu companyId={c.id} status={c.status} />
+                    </td>
                   </tr>
                 );
               })}
