@@ -30,7 +30,7 @@ export default function InquiryForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="mt-6 flex flex-col items-center gap-1 text-zinc-500"
+        className="flex flex-col items-center gap-1 text-zinc-500"
       >
         <span className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white">
           &#128172;
@@ -41,57 +41,63 @@ export default function InquiryForm({
   }
 
   return (
-    <div className="mt-6 w-full rounded-xl border border-zinc-200 p-4 dark:border-zinc-800">
-      {sent ? (
-        <p className="text-center text-sm text-green-600">
-          Thanks! Your message has been sent.
-        </p>
-      ) : (
-        <form onSubmit={handleSubmit} className="flex flex-col gap-3">
-          <input
-            required
-            placeholder="Name *"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            className="input"
-          />
-          <input
-            required
-            placeholder="Phone *"
-            value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            className="input"
-          />
-          <input
-            placeholder="Email"
-            value={email}
-            onChange={(e) => setEmail(e.target.value)}
-            className="input"
-          />
-          <textarea
-            placeholder="Message"
-            value={message}
-            onChange={(e) => setMessage(e.target.value)}
-            className="input"
-            rows={3}
-          />
-          <div className="flex gap-2">
-            <button
-              type="submit"
-              className={`flex-1 rounded-lg py-2 text-sm font-semibold text-white ${buttonClass}`}
-            >
-              Send
-            </button>
-            <button
-              type="button"
-              onClick={() => setOpen(false)}
-              className="flex-1 rounded-lg border border-zinc-300 py-2 text-sm dark:border-zinc-700"
-            >
-              Cancel
-            </button>
-          </div>
-        </form>
-      )}
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/50 sm:items-center">
+      <div className="w-full max-w-sm rounded-t-2xl bg-white p-6 dark:bg-zinc-950 sm:rounded-2xl">
+        <h3 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+          Send Inquiry
+        </h3>
+
+        {sent ? (
+          <p className="mt-6 text-center text-sm text-green-600">
+            Thanks! Your message has been sent.
+          </p>
+        ) : (
+          <form onSubmit={handleSubmit} className="mt-4 flex flex-col gap-3">
+            <input
+              required
+              placeholder="Name *"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="input"
+            />
+            <input
+              required
+              placeholder="Phone *"
+              value={phone}
+              onChange={(e) => setPhone(e.target.value)}
+              className="input"
+            />
+            <input
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="input"
+            />
+            <textarea
+              placeholder="Message"
+              value={message}
+              onChange={(e) => setMessage(e.target.value)}
+              className="input"
+              rows={4}
+            />
+            <div className="mt-2 flex gap-2">
+              <button
+                type="submit"
+                className={`flex-1 rounded-lg py-2 text-sm font-semibold text-white ${buttonClass}`}
+              >
+                Send
+              </button>
+              <button
+                type="button"
+                onClick={() => setOpen(false)}
+                className="flex-1 rounded-lg bg-zinc-200 py-2 text-sm font-semibold text-zinc-700 dark:bg-zinc-800 dark:text-zinc-200"
+              >
+                Cancel
+              </button>
+            </div>
+          </form>
+        )}
+      </div>
     </div>
   );
 }

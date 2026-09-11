@@ -4,6 +4,7 @@ import type { Metadata } from "next";
 import { getDb, sql } from "@/lib/db";
 import { getTheme } from "@/lib/themes";
 import InquiryForm from "./InquiryForm";
+import LeadCaptureForm from "./LeadCaptureForm";
 
 async function getEmployee(slug: string) {
   const db = await getDb();
@@ -12,6 +13,7 @@ async function getEmployee(slug: string) {
     .input("slug", sql.NVarChar, slug)
     .query(`
       SELECT e.*, c.company_name AS tenant_name, c.company_bio, c.logo AS company_logo_url,
+        c.website AS company_website,
         c.card_background AS company_card_background,
         c.social_facebook AS company_social_facebook,
         c.social_instagram AS company_social_instagram,
@@ -72,19 +74,21 @@ export default async function CardPage({
     );
 
   const socials = [
-    { key: "social_facebook", label: "Facebook" },
-    { key: "social_instagram", label: "Instagram" },
-    { key: "social_tiktok", label: "TikTok" },
-    { key: "social_twitter", label: "X" },
-    { key: "social_linkedin", label: "LinkedIn" },
-    { key: "social_youtube", label: "YouTube" },
-    { key: "social_xiaohongshu", label: "Xiaohongshu" },
+    { key: "social_facebook", label: "Facebook", glyph: "f", color: "bg-zinc-800" },
+    { key: "social_instagram", label: "Instagram", glyph: "\u{1F4F7}", color: "bg-zinc-800" },
+    { key: "social_tiktok", label: "TikTok", glyph: "♪", color: "bg-zinc-800" },
+    { key: "social_twitter", label: "X", glyph: "\u{1D54F}", color: "bg-zinc-800" },
+    { key: "social_linkedin", label: "LinkedIn", glyph: "in", color: "bg-zinc-800" },
+    { key: "social_youtube", label: "YouTube", glyph: "▶", color: "bg-zinc-800" },
+    { key: "social_xiaohongshu", label: "Xiaohongshu", glyph: "\u{1F4D5}", color: "bg-zinc-800" },
   ]
     .map((s) => ({
       ...s,
       url: employee[s.key] || employee[`company_${s.key}`],
     }))
     .filter((s) => s.url);
+
+  const website = employee.company_website;
 
   const cardBackground = employee.card_background || employee.company_card_background;
   const theme = getTheme(employee.card_theme);
@@ -162,24 +166,39 @@ export default async function CardPage({
             </p>
           )}
 
-          <InquiryForm
-            employeeId={employee.id}
-            companyId={employee.company_id}
-            slug={slug}
-            buttonClass={theme.button}
-          />
+          <div className="mt-6 flex flex-wrap justify-center gap-4">
+            <LeadCaptureForm employeeId={employee.id} companyId={employee.company_id} />
+            <InquiryForm
+              employeeId={employee.id}
+              companyId={employee.company_id}
+              slug={slug}
+              buttonClass={theme.button}
+            />
+          </div>
 
-          {socials.length > 0 && (
-            <div className="mt-6 flex gap-4">
+          {(website || socials.length > 0) && (
+            <div className="mt-6 flex flex-wrap justify-center gap-4">
+              {website && (
+                <a
+                  href={website}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label="Website"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-500 text-base text-white hover:bg-teal-600"
+                >
+                  &#127760;
+                </a>
+              )}
               {socials.map((s) => (
                 <a
                   key={s.key}
                   href={s.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-zinc-100 text-xs font-semibold text-zinc-700 hover:bg-zinc-200 dark:bg-zinc-800 dark:text-zinc-200"
+                  aria-label={s.label}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full ${s.color} text-sm font-semibold text-white hover:opacity-90`}
                 >
-                  {s.label.slice(0, 2)}
+                  {s.glyph}
                 </a>
               ))}
             </div>
