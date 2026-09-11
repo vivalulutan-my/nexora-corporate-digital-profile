@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { FiCamera } from "react-icons/fi";
 import { captureLead } from "@/app/card/actions";
 
 function extractEmail(text: string) {
@@ -75,9 +76,9 @@ export default function LeadCaptureForm({
       <button
         onClick={() => setOpen(true)}
         aria-label="Scan Card"
-        className="flex aspect-square items-center justify-center rounded-2xl bg-red-500 text-xl text-white"
+        className="flex aspect-square items-center justify-center rounded-2xl bg-red-500 text-white"
       >
-        &#128248;
+        <FiCamera size={20} />
       </button>
     );
   }

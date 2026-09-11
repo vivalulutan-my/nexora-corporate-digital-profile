@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { FiMessageCircle } from "react-icons/fi";
 import { submitInquiry } from "@/app/card/actions";
 
 export default function InquiryForm({
@@ -31,9 +32,9 @@ export default function InquiryForm({
       <button
         onClick={() => setOpen(true)}
         aria-label="Inquiry"
-        className="flex aspect-square items-center justify-center rounded-2xl bg-purple-600 text-xl text-white"
+        className="flex aspect-square items-center justify-center rounded-2xl bg-purple-600 text-white"
       >
-        &#128172;
+        <FiMessageCircle size={20} />
       </button>
     );
   }

@@ -1,6 +1,22 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
 import type { Metadata } from "next";
+import {
+  FiPhone,
+  FiMail,
+  FiUserPlus,
+  FiGlobe,
+  FiBook,
+} from "react-icons/fi";
+import {
+  FaWhatsapp,
+  FaFacebookF,
+  FaInstagram,
+  FaTiktok,
+  FaXTwitter,
+  FaLinkedinIn,
+  FaYoutube,
+} from "react-icons/fa6";
 import { getDb, sql } from "@/lib/db";
 import { getTheme } from "@/lib/themes";
 import InquiryForm from "./InquiryForm";
@@ -74,13 +90,13 @@ export default async function CardPage({
     );
 
   const socials = [
-    { key: "social_facebook", label: "Facebook", glyph: "f", color: "bg-zinc-800" },
-    { key: "social_instagram", label: "Instagram", glyph: "\u{1F4F7}", color: "bg-zinc-800" },
-    { key: "social_tiktok", label: "TikTok", glyph: "♪", color: "bg-zinc-800" },
-    { key: "social_twitter", label: "X", glyph: "\u{1D54F}", color: "bg-zinc-800" },
-    { key: "social_linkedin", label: "LinkedIn", glyph: "in", color: "bg-zinc-800" },
-    { key: "social_youtube", label: "YouTube", glyph: "▶", color: "bg-zinc-800" },
-    { key: "social_xiaohongshu", label: "Xiaohongshu", glyph: "\u{1F4D5}", color: "bg-zinc-800" },
+    { key: "social_facebook", label: "Facebook", Icon: FaFacebookF, color: "bg-zinc-800" },
+    { key: "social_instagram", label: "Instagram", Icon: FaInstagram, color: "bg-zinc-800" },
+    { key: "social_tiktok", label: "TikTok", Icon: FaTiktok, color: "bg-zinc-800" },
+    { key: "social_twitter", label: "X", Icon: FaXTwitter, color: "bg-zinc-800" },
+    { key: "social_linkedin", label: "LinkedIn", Icon: FaLinkedinIn, color: "bg-zinc-800" },
+    { key: "social_youtube", label: "YouTube", Icon: FaYoutube, color: "bg-zinc-800" },
+    { key: "social_xiaohongshu", label: "Xiaohongshu", Icon: FiBook, color: "bg-zinc-800" },
   ]
     .map((s) => ({
       ...s,
@@ -185,9 +201,9 @@ export default async function CardPage({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label="Website"
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-500 text-base text-white hover:bg-teal-600"
+                  className="flex h-10 w-10 items-center justify-center rounded-full bg-teal-500 text-white hover:bg-teal-600"
                 >
-                  &#127760;
+                  <FiGlobe size={18} />
                 </a>
               )}
               {socials.map((s) => (
@@ -197,9 +213,9 @@ export default async function CardPage({
                   target="_blank"
                   rel="noopener noreferrer"
                   aria-label={s.label}
-                  className={`flex h-10 w-10 items-center justify-center rounded-full ${s.color} text-sm font-semibold text-white hover:opacity-90`}
+                  className={`flex h-10 w-10 items-center justify-center rounded-full ${s.color} text-white hover:opacity-90`}
                 >
-                  {s.glyph}
+                  <s.Icon size={16} />
                 </a>
               ))}
             </div>
@@ -265,7 +281,7 @@ function ActionIcon({
       target={href.startsWith("http") ? "_blank" : undefined}
       rel="noopener noreferrer"
       aria-label={ICON_LABELS[icon]}
-      className={`flex aspect-square items-center justify-center rounded-2xl ${color} text-xl text-white`}
+      className={`flex aspect-square items-center justify-center rounded-2xl ${color} text-white`}
     >
       <Glyph icon={icon} />
     </a>
@@ -275,13 +291,13 @@ function ActionIcon({
 function Glyph({ icon }: { icon: string }) {
   switch (icon) {
     case "call":
-      return <span>&#128222;</span>;
+      return <FiPhone size={20} />;
     case "whatsapp":
-      return <span>&#128172;</span>;
+      return <FaWhatsapp size={20} />;
     case "email":
-      return <span>&#9993;</span>;
+      return <FiMail size={20} />;
     case "vcard":
-      return <span>&#128100;</span>;
+      return <FiUserPlus size={20} />;
     default:
       return null;
   }
