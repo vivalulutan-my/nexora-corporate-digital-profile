@@ -6,10 +6,12 @@ import { submitInquiry } from "@/app/card/actions";
 export default function InquiryForm({
   employeeId,
   companyId,
+  buttonClass = "bg-blue-900 hover:bg-blue-800",
 }: {
   employeeId: number;
   companyId: number;
   slug: string;
+  buttonClass?: string;
 }) {
   const [open, setOpen] = useState(false);
   const [sent, setSent] = useState(false);
@@ -76,7 +78,7 @@ export default function InquiryForm({
           <div className="flex gap-2">
             <button
               type="submit"
-              className="flex-1 rounded-lg bg-blue-900 py-2 text-sm font-semibold text-white"
+              className={`flex-1 rounded-lg py-2 text-sm font-semibold text-white ${buttonClass}`}
             >
               Send
             </button>

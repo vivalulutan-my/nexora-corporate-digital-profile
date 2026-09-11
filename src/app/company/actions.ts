@@ -58,6 +58,7 @@ export async function createEmployee(formData: FormData) {
   const branchId = formData.get("branchId")
     ? Number(formData.get("branchId"))
     : null;
+  const cardTheme = String(formData.get("cardTheme") ?? "corporate").trim();
   const photoFile = formData.get("photo") as File | null;
   const socials = readSocialInputs(formData);
 
@@ -89,16 +90,17 @@ export async function createEmployee(formData: FormData) {
     .input("profilePhoto", sql.NVarChar, photoPath)
     .input("cardSlug", sql.NVarChar, slug)
     .input("cardUrl", sql.NVarChar, cardUrl)
-    .input("qrCodePath", sql.NVarChar, qrPath);
+    .input("qrCodePath", sql.NVarChar, qrPath)
+    .input("cardTheme", sql.VarChar, cardTheme);
 
   socials.forEach((s) => request.input(s.column, sql.NVarChar, s.value));
 
   await request.query(`
       INSERT INTO employees
-        (company_id, branch_id, full_name, job_title, department, bio, email, phone, profile_photo, card_slug, card_url, qr_code_path, status,
+        (company_id, branch_id, full_name, job_title, department, bio, email, phone, profile_photo, card_slug, card_url, qr_code_path, card_theme, status,
          ${socials.map((s) => s.column).join(", ")})
       VALUES
-        (@companyId, @branchId, @fullName, @jobTitle, @department, @bio, @email, @phone, @profilePhoto, @cardSlug, @cardUrl, @qrCodePath, 'active',
+        (@companyId, @branchId, @fullName, @jobTitle, @department, @bio, @email, @phone, @profilePhoto, @cardSlug, @cardUrl, @qrCodePath, @cardTheme, 'active',
          ${socials.map((s) => `@${s.column}`).join(", ")})
     `);
 
@@ -119,6 +121,7 @@ export async function updateEmployee(formData: FormData) {
   const branchId = formData.get("branchId")
     ? Number(formData.get("branchId"))
     : null;
+  const cardTheme = String(formData.get("cardTheme") ?? "corporate").trim();
   const photoFile = formData.get("photo") as File | null;
   const socials = readSocialInputs(formData);
 
@@ -141,7 +144,8 @@ export async function updateEmployee(formData: FormData) {
     .input("department", sql.NVarChar, department || null)
     .input("bio", sql.NVarChar, bio || null)
     .input("email", sql.NVarChar, email || null)
-    .input("phone", sql.NVarChar, phone || null);
+    .input("phone", sql.NVarChar, phone || null)
+    .input("cardTheme", sql.VarChar, cardTheme);
 
   socials.forEach((s) => request.input(s.column, sql.NVarChar, s.value));
 
@@ -157,6 +161,7 @@ export async function updateEmployee(formData: FormData) {
         bio = @bio,
         email = @email,
         phone = @phone,
+        card_theme = @cardTheme,
         ${socials.map((s) => `${s.column} = @${s.column}`).join(", ")}
         ${photoSetClause}
       WHERE id = @id AND company_id = @companyId

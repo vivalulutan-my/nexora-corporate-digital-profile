@@ -62,6 +62,12 @@ export default async function CompanyLayout({
             Analytics
           </Link>
           <Link
+            href="/company/leads"
+            className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-blue-900"
+          >
+            Leads
+          </Link>
+          <Link
             href="/company/profile"
             className="rounded-lg px-3 py-2 text-sm font-medium hover:bg-blue-900"
           >

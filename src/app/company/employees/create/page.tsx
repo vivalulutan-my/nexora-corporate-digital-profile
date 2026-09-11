@@ -2,6 +2,7 @@ import { getSession } from "@/lib/session";
 import { getDb, sql } from "@/lib/db";
 import { createEmployee } from "@/app/company/actions";
 import SocialFields from "@/components/SocialFields";
+import ThemePicker from "@/components/ThemePicker";
 
 export default async function CreateEmployeePage() {
   const session = await getSession();
@@ -42,6 +43,7 @@ export default async function CreateEmployeePage() {
           <textarea name="bio" rows={3} className="input" />
         </Field>
         <SocialFields />
+        <ThemePicker />
         <Field label="Branch">
           <select name="branchId" className="input">
             <option value="">No branch</option>

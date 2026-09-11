@@ -3,6 +3,7 @@ import { getSession } from "@/lib/session";
 import { getDb, sql } from "@/lib/db";
 import { updateEmployee } from "@/app/company/actions";
 import SocialFields from "@/components/SocialFields";
+import ThemePicker from "@/components/ThemePicker";
 
 export default async function EditEmployeePage({
   params,
@@ -60,6 +61,7 @@ export default async function EditEmployeePage({
           <textarea name="bio" rows={3} defaultValue={employee.bio ?? ""} className="input" />
         </Field>
         <SocialFields defaultValues={employee} />
+        <ThemePicker defaultValue={employee.card_theme} />
         <Field label="Branch">
           <select name="branchId" defaultValue={employee.branch_id ?? ""} className="input">
             <option value="">No branch</option>

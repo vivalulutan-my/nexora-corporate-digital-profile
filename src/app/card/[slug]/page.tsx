@@ -1,6 +1,8 @@
 import Image from "next/image";
 import { notFound } from "next/navigation";
+import type { Metadata } from "next";
 import { getDb, sql } from "@/lib/db";
+import { getTheme } from "@/lib/themes";
 import InquiryForm from "./InquiryForm";
 
 async function getEmployee(slug: string) {
@@ -23,6 +25,32 @@ async function getEmployee(slug: string) {
       WHERE e.card_slug = @slug AND e.status = 'active'
     `);
   return result.recordset[0] ?? null;
+}
+
+export async function generateMetadata({
+  params,
+}: {
+  params: Promise<{ slug: string }>;
+}): Promise<Metadata> {
+  const { slug } = await params;
+  const employee = await getEmployee(slug);
+  if (!employee) return { title: "Card not found" };
+
+  const title = `${employee.full_name} — ${employee.tenant_name}`;
+  const description =
+    employee.bio ||
+    employee.company_bio ||
+    `${employee.full_name}'s digital business card at ${employee.tenant_name}.`;
+
+  return {
+    title,
+    description,
+    openGraph: {
+      title,
+      description,
+      images: employee.profile_photo ? [employee.profile_photo] : undefined,
+    },
+  };
 }
 
 export default async function CardPage({
@@ -59,11 +87,12 @@ export default async function CardPage({
     .filter((s) => s.url);
 
   const cardBackground = employee.card_background || employee.company_card_background;
+  const theme = getTheme(employee.card_theme);
 
   return (
     <div className="flex min-h-screen items-start justify-center bg-zinc-100 px-4 py-8 dark:bg-zinc-900">
       <div className="w-full max-w-sm overflow-hidden rounded-2xl bg-white shadow-lg dark:bg-zinc-950">
-        <div className="relative h-32 bg-gradient-to-br from-[#1e3a8a] to-[#0b1638]">
+        <div className={`relative h-32 ${theme.banner}`}>
           {cardBackground && (
             <Image src={cardBackground} alt="" fill className="object-cover" />
           )}
@@ -88,7 +117,7 @@ export default async function CardPage({
           {employee.job_title && (
             <p className="text-sm text-zinc-500">{employee.job_title}</p>
           )}
-          <p className="text-sm font-medium text-blue-800 dark:text-blue-400">
+          <p className={`text-sm font-medium ${theme.accent}`}>
             {employee.tenant_name}
           </p>
 
@@ -107,7 +136,12 @@ export default async function CardPage({
             {employee.email && (
               <ActionIcon href={`mailto:${employee.email}`} color="bg-amber-500" label="Email" icon="email" />
             )}
-            <ActionIcon href={`/card/${slug}/vcard`} color="bg-zinc-700" label="Save Contact" icon="vcard" />
+            <ActionIcon
+              href={`/card/${slug}/vcard`}
+              color={theme.button.split(" ")[0]}
+              label="Save Contact"
+              icon="vcard"
+            />
           </div>
 
           {employee.bio && (
@@ -116,7 +150,12 @@ export default async function CardPage({
             </p>
           )}
 
-          <InquiryForm employeeId={employee.id} companyId={employee.company_id} slug={slug} />
+          <InquiryForm
+            employeeId={employee.id}
+            companyId={employee.company_id}
+            slug={slug}
+            buttonClass={theme.button}
+          />
 
           {socials.length > 0 && (
             <div className="mt-6 flex gap-4">
