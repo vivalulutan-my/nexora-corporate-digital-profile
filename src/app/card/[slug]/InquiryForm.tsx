@@ -30,12 +30,10 @@ export default function InquiryForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex flex-col items-center gap-1 text-zinc-500"
+        aria-label="Inquiry"
+        className="flex aspect-square items-center justify-center rounded-2xl bg-purple-600 text-xl text-white"
       >
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-600 text-white">
-          &#128172;
-        </span>
-        <span className="text-[10px]">Inquiry</span>
+        &#128172;
       </button>
     );
   }

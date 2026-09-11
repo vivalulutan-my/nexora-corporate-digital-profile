@@ -125,12 +125,11 @@ export default async function CardPage({
             {employee.tenant_name}
           </p>
 
-          <div className="mt-6 grid grid-cols-4 gap-4">
+          <div className="mt-6 grid grid-cols-4 gap-3">
             {employee.phone && (
               <ActionIcon
                 href={`/card/${slug}/track/call?url=${encodeURIComponent(`tel:${employee.phone}`)}`}
                 color="bg-blue-600"
-                label="Call"
                 icon="call"
               />
             )}
@@ -140,7 +139,6 @@ export default async function CardPage({
                   `https://wa.me/${employee.phone.replace(/\D/g, "")}`
                 )}`}
                 color="bg-green-500"
-                label="WhatsApp"
                 icon="whatsapp"
               />
             )}
@@ -148,25 +146,14 @@ export default async function CardPage({
               <ActionIcon
                 href={`/card/${slug}/track/email?url=${encodeURIComponent(`mailto:${employee.email}`)}`}
                 color="bg-amber-500"
-                label="Email"
                 icon="email"
               />
             )}
             <ActionIcon
               href={`/card/${slug}/track/vcard?url=${encodeURIComponent(`/card/${slug}/vcard`)}`}
               color={theme.button.split(" ")[0]}
-              label="Save Contact"
               icon="vcard"
             />
-          </div>
-
-          {employee.bio && (
-            <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
-              {employee.bio}
-            </p>
-          )}
-
-          <div className="mt-6 flex flex-wrap justify-center gap-4">
             <LeadCaptureForm employeeId={employee.id} companyId={employee.company_id} />
             <InquiryForm
               employeeId={employee.id}
@@ -175,6 +162,12 @@ export default async function CardPage({
               buttonClass={theme.button}
             />
           </div>
+
+          {employee.bio && (
+            <p className="mt-6 text-center text-sm text-zinc-600 dark:text-zinc-400">
+              {employee.bio}
+            </p>
+          )}
 
           {(website || socials.length > 0) && (
             <div className="mt-6 flex flex-wrap justify-center gap-4">
@@ -229,15 +222,20 @@ export default async function CardPage({
   );
 }
 
+const ICON_LABELS: Record<string, string> = {
+  call: "Call",
+  whatsapp: "WhatsApp",
+  email: "Email",
+  vcard: "Save Contact",
+};
+
 function ActionIcon({
   href,
   color,
-  label,
   icon,
 }: {
   href: string;
   color: string;
-  label: string;
   icon: string;
 }) {
   return (
@@ -245,14 +243,10 @@ function ActionIcon({
       href={href}
       target={href.startsWith("http") ? "_blank" : undefined}
       rel="noopener noreferrer"
-      className="flex flex-col items-center gap-1"
+      aria-label={ICON_LABELS[icon]}
+      className={`flex aspect-square items-center justify-center rounded-2xl ${color} text-xl text-white`}
     >
-      <span
-        className={`flex h-12 w-12 items-center justify-center rounded-full ${color} text-white`}
-      >
-        <Glyph icon={icon} />
-      </span>
-      <span className="text-[10px] text-zinc-500">{label}</span>
+      <Glyph icon={icon} />
     </a>
   );
 }

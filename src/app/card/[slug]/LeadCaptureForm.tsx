@@ -72,12 +72,10 @@ export default function LeadCaptureForm({
     return (
       <button
         onClick={() => setOpen(true)}
-        className="flex flex-col items-center gap-1"
+        aria-label="Scan Card"
+        className="flex aspect-square items-center justify-center rounded-2xl bg-red-500 text-xl text-white"
       >
-        <span className="flex h-12 w-12 items-center justify-center rounded-full bg-red-500 text-white">
-          &#128248;
-        </span>
-        <span className="text-[10px] text-zinc-500">Scan Card</span>
+        &#128248;
       </button>
     );
   }
