@@ -1,4 +1,5 @@
 import Image from "next/image";
+import Link from "next/link";
 import { getSession } from "@/lib/session";
 import { getDb, sql } from "@/lib/db";
 import EmployeeRow from "./EmployeeRow";
@@ -83,7 +84,15 @@ export default async function ManageEmployeesPage() {
                     )}
                   </td>
                   <td className="py-3 pr-4">
-                    <EmployeeRow id={e.id} status={e.status} />
+                    <div className="flex gap-2">
+                      <Link
+                        href={`/company/employees/${e.id}/edit`}
+                        className="rounded-lg border border-zinc-300 px-3 py-1 text-xs font-medium hover:bg-zinc-100 dark:border-zinc-700 dark:hover:bg-zinc-800"
+                      >
+                        Edit
+                      </Link>
+                      <EmployeeRow id={e.id} status={e.status} />
+                    </div>
                   </td>
                 </tr>
               ))}

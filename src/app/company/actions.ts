@@ -28,6 +28,23 @@ function slugify(name: string) {
   );
 }
 
+const SOCIAL_FIELDS = [
+  "facebook",
+  "instagram",
+  "twitter",
+  "tiktok",
+  "youtube",
+  "linkedin",
+  "xiaohongshu",
+] as const;
+
+function readSocialInputs(formData: FormData) {
+  return SOCIAL_FIELDS.map((key) => ({
+    column: `social_${key}`,
+    value: String(formData.get(`social_${key}`) ?? "").trim() || null,
+  }));
+}
+
 export async function createEmployee(formData: FormData) {
   const session = await requireCompanySession();
   const companyId = session.companyId!;
@@ -37,10 +54,12 @@ export async function createEmployee(formData: FormData) {
   const department = String(formData.get("department") ?? "").trim();
   const email = String(formData.get("email") ?? "").trim();
   const phone = String(formData.get("phone") ?? "").trim();
+  const bio = String(formData.get("bio") ?? "").trim();
   const branchId = formData.get("branchId")
     ? Number(formData.get("branchId"))
     : null;
   const photoFile = formData.get("photo") as File | null;
+  const socials = readSocialInputs(formData);
 
   if (!fullName) {
     return { success: false, message: "Full name is required." };
@@ -57,24 +76,90 @@ export async function createEmployee(formData: FormData) {
   const qrPath = `/uploads/qrcodes/${qrFilename}`;
 
   const db = await getDb();
-  await db
+  const request = db
     .request()
     .input("companyId", sql.Int, companyId)
     .input("branchId", sql.Int, branchId)
     .input("fullName", sql.NVarChar, fullName)
     .input("jobTitle", sql.NVarChar, jobTitle || null)
     .input("department", sql.NVarChar, department || null)
+    .input("bio", sql.NVarChar, bio || null)
     .input("email", sql.NVarChar, email || null)
     .input("phone", sql.NVarChar, phone || null)
     .input("profilePhoto", sql.NVarChar, photoPath)
     .input("cardSlug", sql.NVarChar, slug)
     .input("cardUrl", sql.NVarChar, cardUrl)
-    .input("qrCodePath", sql.NVarChar, qrPath)
-    .query(`
+    .input("qrCodePath", sql.NVarChar, qrPath);
+
+  socials.forEach((s) => request.input(s.column, sql.NVarChar, s.value));
+
+  await request.query(`
       INSERT INTO employees
-        (company_id, branch_id, full_name, job_title, department, email, phone, profile_photo, card_slug, card_url, qr_code_path, status)
+        (company_id, branch_id, full_name, job_title, department, bio, email, phone, profile_photo, card_slug, card_url, qr_code_path, status,
+         ${socials.map((s) => s.column).join(", ")})
       VALUES
-        (@companyId, @branchId, @fullName, @jobTitle, @department, @email, @phone, @profilePhoto, @cardSlug, @cardUrl, @qrCodePath, 'active')
+        (@companyId, @branchId, @fullName, @jobTitle, @department, @bio, @email, @phone, @profilePhoto, @cardSlug, @cardUrl, @qrCodePath, 'active',
+         ${socials.map((s) => `@${s.column}`).join(", ")})
+    `);
+
+  redirect("/company/employees");
+}
+
+export async function updateEmployee(formData: FormData) {
+  const session = await requireCompanySession();
+  const companyId = session.companyId!;
+
+  const employeeId = Number(formData.get("employeeId"));
+  const fullName = String(formData.get("fullName") ?? "").trim();
+  const jobTitle = String(formData.get("jobTitle") ?? "").trim();
+  const department = String(formData.get("department") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
+  const phone = String(formData.get("phone") ?? "").trim();
+  const bio = String(formData.get("bio") ?? "").trim();
+  const branchId = formData.get("branchId")
+    ? Number(formData.get("branchId"))
+    : null;
+  const photoFile = formData.get("photo") as File | null;
+  const socials = readSocialInputs(formData);
+
+  if (!fullName || !employeeId) {
+    return { success: false, message: "Full name is required." };
+  }
+
+  const photoPath = photoFile && photoFile.size > 0
+    ? await saveUpload(photoFile, "employees")
+    : null;
+
+  const db = await getDb();
+  const request = db
+    .request()
+    .input("id", sql.Int, employeeId)
+    .input("companyId", sql.Int, companyId)
+    .input("branchId", sql.Int, branchId)
+    .input("fullName", sql.NVarChar, fullName)
+    .input("jobTitle", sql.NVarChar, jobTitle || null)
+    .input("department", sql.NVarChar, department || null)
+    .input("bio", sql.NVarChar, bio || null)
+    .input("email", sql.NVarChar, email || null)
+    .input("phone", sql.NVarChar, phone || null);
+
+  socials.forEach((s) => request.input(s.column, sql.NVarChar, s.value));
+
+  const photoSetClause = photoPath ? ", profile_photo = @profilePhoto" : "";
+  if (photoPath) request.input("profilePhoto", sql.NVarChar, photoPath);
+
+  await request.query(`
+      UPDATE employees SET
+        branch_id = @branchId,
+        full_name = @fullName,
+        job_title = @jobTitle,
+        department = @department,
+        bio = @bio,
+        email = @email,
+        phone = @phone,
+        ${socials.map((s) => `${s.column} = @${s.column}`).join(", ")}
+        ${photoSetClause}
+      WHERE id = @id AND company_id = @companyId
     `);
 
   redirect("/company/employees");
