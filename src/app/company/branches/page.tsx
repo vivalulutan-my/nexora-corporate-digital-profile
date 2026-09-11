@@ -1,6 +1,7 @@
 import { getSession } from "@/lib/session";
 import { getDb, sql } from "@/lib/db";
 import { createBranch } from "@/app/company/actions";
+import BranchRow from "./BranchRow";
 
 export default async function BranchesPage() {
   const session = await getSession();
@@ -10,7 +11,7 @@ export default async function BranchesPage() {
     .request()
     .input("companyId", sql.Int, session!.companyId)
     .query(`
-      SELECT b.id, b.branch_name, b.address, b.phone, b.email,
+      SELECT b.id, b.branch_name, b.address, b.phone, b.email, b.city, b.state,
         (SELECT COUNT(*) FROM employees e WHERE e.branch_id = b.id) AS employee_count
       FROM branches b
       WHERE b.company_id = @companyId
@@ -29,6 +30,12 @@ export default async function BranchesPage() {
       >
         <input name="branchName" placeholder="Branch Name" required className="input" />
         <input name="address" placeholder="Address" className="input" />
+        <div className="grid grid-cols-2 gap-4">
+          <input name="city" placeholder="City" className="input" />
+          <input name="state" placeholder="State" className="input" />
+          <input name="postcode" placeholder="Postcode" className="input" />
+          <input name="country" placeholder="Country" className="input" />
+        </div>
         <input name="phone" placeholder="Phone" className="input" />
         <input name="email" placeholder="Email" className="input" />
         <button
@@ -45,20 +52,18 @@ export default async function BranchesPage() {
             <tr className="border-b border-zinc-200 text-zinc-500 dark:border-zinc-800">
               <th className="py-2 pr-4 font-medium">Branch</th>
               <th className="py-2 pr-4 font-medium">Address</th>
+              <th className="py-2 pr-4 font-medium">City / State</th>
               <th className="py-2 pr-4 font-medium">Employees</th>
+              <th className="py-2 pr-4 font-medium">Actions</th>
             </tr>
           </thead>
           <tbody>
             {branches.recordset.map((b) => (
-              <tr key={b.id} className="border-b border-zinc-100 dark:border-zinc-900">
-                <td className="py-3 pr-4 font-medium">{b.branch_name}</td>
-                <td className="py-3 pr-4">{b.address ?? "—"}</td>
-                <td className="py-3 pr-4">{b.employee_count}</td>
-              </tr>
+              <BranchRow key={b.id} branch={b} />
             ))}
             {branches.recordset.length === 0 && (
               <tr>
-                <td colSpan={3} className="py-6 text-center text-zinc-400">
+                <td colSpan={5} className="py-6 text-center text-zinc-400">
                   No branches yet.
                 </td>
               </tr>

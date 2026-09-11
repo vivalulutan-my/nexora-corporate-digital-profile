@@ -251,16 +251,25 @@ export async function updateCompanyProfile(formData: FormData) {
   redirect("/company/profile");
 }
 
+function readBranchFields(formData: FormData) {
+  return {
+    branchName: String(formData.get("branchName") ?? "").trim(),
+    address: String(formData.get("address") ?? "").trim() || null,
+    phone: String(formData.get("phone") ?? "").trim() || null,
+    email: String(formData.get("email") ?? "").trim() || null,
+    city: String(formData.get("city") ?? "").trim() || null,
+    state: String(formData.get("state") ?? "").trim() || null,
+    postcode: String(formData.get("postcode") ?? "").trim() || null,
+    country: String(formData.get("country") ?? "").trim() || null,
+  };
+}
+
 export async function createBranch(formData: FormData) {
   const session = await requireCompanySession();
   const companyId = session.companyId!;
+  const f = readBranchFields(formData);
 
-  const branchName = String(formData.get("branchName") ?? "").trim();
-  const address = String(formData.get("address") ?? "").trim();
-  const phone = String(formData.get("phone") ?? "").trim();
-  const email = String(formData.get("email") ?? "").trim();
-
-  if (!branchName) {
+  if (!f.branchName) {
     return { success: false, message: "Branch name is required." };
   }
 
@@ -268,14 +277,73 @@ export async function createBranch(formData: FormData) {
   await db
     .request()
     .input("companyId", sql.Int, companyId)
-    .input("branchName", sql.NVarChar, branchName)
-    .input("address", sql.NVarChar, address || null)
-    .input("phone", sql.NVarChar, phone || null)
-    .input("email", sql.NVarChar, email || null)
+    .input("branchName", sql.NVarChar, f.branchName)
+    .input("address", sql.NVarChar, f.address)
+    .input("phone", sql.NVarChar, f.phone)
+    .input("email", sql.NVarChar, f.email)
+    .input("city", sql.NVarChar, f.city)
+    .input("state", sql.NVarChar, f.state)
+    .input("postcode", sql.NVarChar, f.postcode)
+    .input("country", sql.NVarChar, f.country)
     .query(`
-      INSERT INTO branches (company_id, branch_name, address, phone, email)
-      VALUES (@companyId, @branchName, @address, @phone, @email)
+      INSERT INTO branches (company_id, branch_name, address, phone, email, city, state, postcode, country)
+      VALUES (@companyId, @branchName, @address, @phone, @email, @city, @state, @postcode, @country)
     `);
+
+  redirect("/company/branches");
+}
+
+export async function updateBranch(formData: FormData) {
+  const session = await requireCompanySession();
+  const companyId = session.companyId!;
+  const branchId = Number(formData.get("branchId"));
+  const f = readBranchFields(formData);
+
+  if (!f.branchName || !branchId) {
+    return { success: false, message: "Branch name is required." };
+  }
+
+  const db = await getDb();
+  await db
+    .request()
+    .input("id", sql.Int, branchId)
+    .input("companyId", sql.Int, companyId)
+    .input("branchName", sql.NVarChar, f.branchName)
+    .input("address", sql.NVarChar, f.address)
+    .input("phone", sql.NVarChar, f.phone)
+    .input("email", sql.NVarChar, f.email)
+    .input("city", sql.NVarChar, f.city)
+    .input("state", sql.NVarChar, f.state)
+    .input("postcode", sql.NVarChar, f.postcode)
+    .input("country", sql.NVarChar, f.country)
+    .query(`
+      UPDATE branches SET
+        branch_name = @branchName, address = @address, phone = @phone, email = @email,
+        city = @city, state = @state, postcode = @postcode, country = @country
+      WHERE id = @id AND company_id = @companyId
+    `);
+
+  redirect("/company/branches");
+}
+
+export async function deleteBranch(branchId: number) {
+  const session = await requireCompanySession();
+  const companyId = session.companyId!;
+  const db = await getDb();
+
+  await db
+    .request()
+    .input("branchId", sql.Int, branchId)
+    .input("companyId", sql.Int, companyId)
+    .query(
+      "UPDATE employees SET branch_id = NULL WHERE branch_id = @branchId AND company_id = @companyId"
+    );
+
+  await db
+    .request()
+    .input("id", sql.Int, branchId)
+    .input("companyId", sql.Int, companyId)
+    .query("DELETE FROM branches WHERE id = @id AND company_id = @companyId");
 
   redirect("/company/branches");
 }
