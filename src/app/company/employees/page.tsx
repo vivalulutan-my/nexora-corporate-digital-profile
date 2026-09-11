@@ -13,7 +13,7 @@ export default async function ManageEmployeesPage() {
     .request()
     .input("companyId", sql.Int, companyId)
     .query(`
-      SELECT e.id, e.full_name, e.job_title, e.status, e.profile_photo, e.qr_code_path, b.branch_name
+      SELECT e.id, e.full_name, e.job_title, e.status, e.profile_photo, e.qr_code_path, e.card_slug, b.branch_name
       FROM employees e
       LEFT JOIN branches b ON b.id = e.branch_id
       WHERE e.company_id = @companyId
@@ -37,6 +37,7 @@ export default async function ManageEmployeesPage() {
                 <th className="py-2 pr-4 font-medium">Branch</th>
                 <th className="py-2 pr-4 font-medium">Status</th>
                 <th className="py-2 pr-4 font-medium">QR</th>
+                <th className="py-2 pr-4 font-medium">Card</th>
                 <th className="py-2 pr-4 font-medium">Action</th>
               </tr>
             </thead>
@@ -84,6 +85,20 @@ export default async function ManageEmployeesPage() {
                     )}
                   </td>
                   <td className="py-3 pr-4">
+                    {e.card_slug ? (
+                      <Link
+                        href={`/card/${e.card_slug}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-blue-700 hover:underline dark:text-blue-400"
+                      >
+                        View
+                      </Link>
+                    ) : (
+                      "—"
+                    )}
+                  </td>
+                  <td className="py-3 pr-4">
                     <div className="flex gap-2">
                       <Link
                         href={`/company/employees/${e.id}/edit`}
@@ -98,7 +113,7 @@ export default async function ManageEmployeesPage() {
               ))}
               {employees.recordset.length === 0 && (
                 <tr>
-                  <td colSpan={7} className="py-6 text-center text-zinc-400">
+                  <td colSpan={8} className="py-6 text-center text-zinc-400">
                     No employees yet.
                   </td>
                 </tr>
