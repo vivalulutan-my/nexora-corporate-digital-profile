@@ -79,11 +79,11 @@ export default async function AnalyticsPage({
     .request()
     .input("companyId", sql.Int, session!.companyId)
     .query(`
-      SELECT TOP 10 e.full_name, COUNT(cv.id) AS views
+      SELECT TOP 10 e.id, e.full_name, e.card_slug, COUNT(cv.id) AS views
       FROM employees e
       LEFT JOIN card_views cv ON cv.employee_id = e.id
       WHERE e.company_id = @companyId
-      GROUP BY e.full_name
+      GROUP BY e.id, e.full_name, e.card_slug
       ORDER BY views DESC
     `);
 
@@ -146,12 +146,26 @@ export default async function AnalyticsPage({
             Most Viewed Cards
           </h2>
           <ul className="mt-4 flex flex-col gap-2 text-sm">
-            {topEmployees.recordset.map((row) => (
-              <li key={row.full_name} className="flex justify-between">
-                <span>{row.full_name}</span>
-                <span className="font-semibold">{row.views}</span>
-              </li>
-            ))}
+            {topEmployees.recordset.map((row) =>
+              row.card_slug ? (
+                <li key={row.id} className="flex justify-between">
+                  <Link
+                    href={`/card/${row.card_slug}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-700 hover:underline dark:text-blue-400"
+                  >
+                    {row.full_name}
+                  </Link>
+                  <span className="font-semibold">{row.views}</span>
+                </li>
+              ) : (
+                <li key={row.id} className="flex justify-between">
+                  <span>{row.full_name}</span>
+                  <span className="font-semibold">{row.views}</span>
+                </li>
+              )
+            )}
             {topEmployees.recordset.length === 0 && (
               <li className="text-zinc-400">No card views yet.</li>
             )}
