@@ -1,9 +1,11 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { login } from "./actions";
 
 export default function Home() {
+  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [notice, setNotice] = useState("");
@@ -17,6 +19,9 @@ export default function Home() {
     setSuccess(result.success);
     setNotice(result.message);
     setPending(false);
+    if (result.success && result.redirectTo) {
+      router.push(result.redirectTo);
+    }
   }
 
   return (
