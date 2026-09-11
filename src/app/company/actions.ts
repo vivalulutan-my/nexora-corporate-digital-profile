@@ -190,7 +190,7 @@ export async function updateCompanyProfile(formData: FormData) {
   const session = await requireCompanySession();
   const companyId = session.companyId!;
 
-  const companyBio = String(formData.get("companyBio") ?? "").trim();
+  const companyBio = String(formData.get("companyBio") ?? "").trim().slice(0, 200);
   const address = String(formData.get("address") ?? "").trim();
   const city = String(formData.get("city") ?? "").trim();
   const state = String(formData.get("state") ?? "").trim();

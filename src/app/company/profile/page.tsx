@@ -52,10 +52,11 @@ export default async function CompanyProfilePage() {
         action={updateCompanyProfile}
         className="mt-6 flex flex-col gap-4 rounded-xl bg-white p-6 shadow-sm dark:bg-zinc-950"
       >
-        <Field label="Company Bio">
+        <Field label="Company Bio (max 200 characters)">
           <textarea
             name="companyBio"
             rows={3}
+            maxLength={200}
             defaultValue={company.company_bio ?? ""}
             className="input"
           />
