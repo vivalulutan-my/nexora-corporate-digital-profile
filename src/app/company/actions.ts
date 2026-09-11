@@ -7,6 +7,7 @@ import QRCode from "qrcode";
 import { getDb, sql } from "@/lib/db";
 import { getSession } from "@/lib/session";
 import { saveUpload } from "@/lib/upload";
+import { getBaseUrl } from "@/lib/url";
 
 async function requireCompanySession() {
   const session = await getSession();
@@ -68,7 +69,8 @@ export async function createEmployee(formData: FormData) {
 
   const photoPath = photoFile ? await saveUpload(photoFile, "employees") : null;
   const slug = slugify(fullName);
-  const cardUrl = `/card/${slug}`;
+  const cardPath = `/card/${slug}`;
+  const cardUrl = `${getBaseUrl()}${cardPath}`;
 
   const qrDir = path.join(process.cwd(), "public", "uploads", "qrcodes");
   await mkdir(qrDir, { recursive: true });
