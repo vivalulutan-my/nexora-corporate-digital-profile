@@ -197,6 +197,19 @@ export default async function CardPage({
             </div>
           )}
 
+          {employee.qr_code_path && (
+            <div className="mt-6 flex flex-col items-center gap-2">
+              <Image
+                src={employee.qr_code_path}
+                alt="Scan to share this card"
+                width={112}
+                height={112}
+                className="rounded-lg border border-zinc-200 p-1.5 dark:border-zinc-800"
+              />
+              <p className="text-xs text-zinc-400">Scan to share this card</p>
+            </div>
+          )}
+
           {employee.company_bio && (
             <p className="mt-6 text-center text-xs text-zinc-400">
               {employee.company_bio}
