@@ -103,27 +103,31 @@ export default async function CardPage({
         </div>
 
         <div className="flex flex-col items-center px-6 pb-8">
-          <div className="-mt-12 h-24 w-24 overflow-hidden rounded-full border-4 border-white bg-zinc-200 dark:border-zinc-950">
-            {employee.profile_photo && (
-              <Image
-                src={employee.profile_photo}
-                alt={employee.full_name}
-                width={96}
-                height={96}
-                className="h-full w-full object-cover"
-              />
-            )}
-          </div>
+          <div className="-mt-10 flex w-full items-center gap-4">
+            <div className="h-20 w-20 shrink-0 overflow-hidden rounded-full border-4 border-white bg-zinc-200 dark:border-zinc-950">
+              {employee.profile_photo && (
+                <Image
+                  src={employee.profile_photo}
+                  alt={employee.full_name}
+                  width={80}
+                  height={80}
+                  className="h-full w-full object-cover"
+                />
+              )}
+            </div>
 
-          <h1 className="mt-3 text-xl font-bold text-zinc-900 dark:text-zinc-50">
-            {employee.full_name}
-          </h1>
-          {employee.job_title && (
-            <p className="text-sm text-zinc-500">{employee.job_title}</p>
-          )}
-          <p className={`text-sm font-medium ${theme.accent}`}>
-            {employee.tenant_name}
-          </p>
+            <div className="flex flex-col pt-8">
+              <h1 className="text-xl font-bold text-zinc-900 dark:text-zinc-50">
+                {employee.full_name}
+              </h1>
+              {employee.job_title && (
+                <p className="text-sm text-zinc-500">{employee.job_title}</p>
+              )}
+              <p className={`text-sm font-medium ${theme.accent}`}>
+                {employee.tenant_name}
+              </p>
+            </div>
+          </div>
 
           <div className="mt-6 grid grid-cols-4 gap-3">
             {employee.phone && (
