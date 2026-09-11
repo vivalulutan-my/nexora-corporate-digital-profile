@@ -1,69 +1,86 @@
-import Image from "next/image";
+"use client";
+
+import { useState } from "react";
 
 export default function Home() {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const [notice, setNotice] = useState("");
+
+  function handleSubmit(e: React.FormEvent) {
+    e.preventDefault();
+    setNotice(
+      "Sign-in isn't wired up yet — the database is still being set up."
+    );
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+    <div className="flex flex-1 flex-col md:flex-row min-h-screen">
+      <div className="flex flex-col justify-center gap-6 px-10 py-20 md:w-1/2 md:px-20 bg-gradient-to-br from-[#1e3a8a] to-[#0b1638] text-white">
+        <h1 className="text-5xl font-bold">Nexora</h1>
+        <p className="text-2xl font-medium text-blue-100">
+          The Next Generation Corporate Identity Platform
+        </p>
+        <p className="max-w-md text-blue-200/80 leading-7">
+          Manage corporate digital identity, employee profiles, and digital
+          business cards securely in one unified platform.
+        </p>
+      </div>
+
+      <div className="flex flex-1 flex-col items-center justify-center gap-6 px-6 py-20 bg-white dark:bg-zinc-950">
+        <div className="w-full max-w-sm">
+          <h2 className="text-3xl font-bold text-blue-900 dark:text-blue-300">
+            Secure Login
+          </h2>
+          <p className="mt-1 text-zinc-500 dark:text-zinc-400">
+            Access your Nexora dashboard
           </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
+
+          <form onSubmit={handleSubmit} className="mt-8 flex flex-col gap-4">
+            <input
+              type="email"
+              required
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              placeholder="Email Address"
+              className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm outline-none focus:border-blue-600 dark:border-zinc-700 dark:bg-zinc-900"
             />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <input
+              type="password"
+              required
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="Password"
+              className="w-full rounded-lg border border-zinc-300 px-4 py-3 text-sm outline-none focus:border-blue-600 dark:border-zinc-700 dark:bg-zinc-900"
+            />
+            <button
+              type="submit"
+              className="w-full rounded-lg bg-blue-900 py-3 font-semibold text-white transition-colors hover:bg-blue-800"
+            >
+              Sign In
+            </button>
+          </form>
+
+          {notice && (
+            <p className="mt-4 rounded-lg bg-amber-50 px-3 py-2 text-sm text-amber-800 dark:bg-amber-950 dark:text-amber-200">
+              {notice}
+            </p>
+          )}
+
+          <div className="mt-4 flex items-center justify-between text-sm">
+            <a href="#" className="text-blue-700 hover:underline dark:text-blue-400">
+              Forgot password?
+            </a>
+            <a href="#" className="text-blue-700 hover:underline dark:text-blue-400">
+              Subscribe
+            </a>
+          </div>
         </div>
-      </main>
+
+        <p className="mt-10 text-xs text-zinc-400">
+          Nexora Platform &copy; Corporate Digital Profile
+        </p>
+      </div>
     </div>
   );
 }
